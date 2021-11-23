@@ -33,8 +33,8 @@ resource "aws_default_route_table" "route_table" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  route{
-    cidr_block    = var.peer_cidr_block
+  route {
+    cidr_block                = var.peer_cidr_block
     vpc_peering_connection_id = var.peering_id
   }
   tags = {
@@ -49,8 +49,9 @@ resource "aws_instance" "my_ubuntu" {
   tags = {
     "Name" = "Amazon"
   }
-  vpc_security_group_ids = [aws_security_group.my_webserver.id]
-  user_data              = <<EOF
+  associate_public_ip_address = "true"
+  vpc_security_group_ids      = [aws_security_group.my_webserver.id]
+  user_data                   = <<EOF
                           #!/bin/bash
                           yum -y update
                           sudo amazon-linux-extras install nginx1
@@ -83,14 +84,14 @@ resource "aws_security_group" "my_webserver" {
 }
 
 output "region" {
-    value = "${var.vpc_region}"
+  value = var.vpc_region
 }
 
 output "vpc_id" {
-    value = "${aws_vpc.vpc.id}"
+  value = aws_vpc.vpc.id
 }
 
 
 output "cidr_block" {
-    value = "${var.cidr_block}"
+  value = var.cidr_block
 }
