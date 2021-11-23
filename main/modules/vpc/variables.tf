@@ -17,3 +17,8 @@ variable "peer_cidr_block" {
 
 variable "peering_id" {
 }
+variable "key_name" {
+  default = "dima-key-frankfurt"
+}
+
+variable "destination_ping_route" {}

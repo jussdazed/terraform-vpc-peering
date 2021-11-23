@@ -9,25 +9,28 @@ terraform {
 }
 
 module "vpc-1" {
-  source          = "./modules/vpc"
-  vpc_region      = "eu-central-1"
-  cidr_block      = "10.0.0.0/16"
-  vpc_name        = "mainVPC"
-  subnet_cidr     = "10.0.10.0/24"
-  ami             = "ami-0bd99ef9eccfee250"
-  peer_cidr_block = module.vpc-2.cidr_block
-  peering_id      = module.peering.peering_id
+  source                 = "./modules/vpc"
+  vpc_region             = "eu-central-1"
+  cidr_block             = "10.0.0.0/16"
+  vpc_name               = "mainVPC"
+  subnet_cidr            = "10.0.10.0/24"
+  ami                    = "ami-0bd99ef9eccfee250"
+  peer_cidr_block        = module.vpc-2.cidr_block
+  peering_id             = module.peering.peering_id
+  destination_ping_route = ["172.16.0.0/16"]
 }
 
 module "vpc-2" {
-  source          = "./modules/vpc"
-  vpc_region      = "eu-west-1"
-  cidr_block      = "172.16.0.0/16"
-  vpc_name        = "peerVPC"
-  subnet_cidr     = "172.16.10.0/24"
-  ami             = "ami-09ce2fc392a4c0fbc"
-  peer_cidr_block = module.vpc-1.cidr_block
-  peering_id      = module.peering.peering_id
+  source                 = "./modules/vpc"
+  vpc_region             = "eu-west-1"
+  cidr_block             = "172.16.0.0/16"
+  vpc_name               = "peerVPC"
+  subnet_cidr            = "172.16.10.0/24"
+  ami                    = "ami-09ce2fc392a4c0fbc"
+  peer_cidr_block        = module.vpc-1.cidr_block
+  peering_id             = module.peering.peering_id
+  key_name               = "ireland-key"
+  destination_ping_route = ["10.0.0.0/16"]
 }
 
 module "peering" {

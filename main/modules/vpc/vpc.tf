@@ -46,18 +46,13 @@ resource "aws_instance" "my_ubuntu" {
   ami           = var.ami
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.sub.id
+  key_name      = var.key_name
   tags = {
     "Name" = "Amazon"
   }
   associate_public_ip_address = "true"
   vpc_security_group_ids      = [aws_security_group.my_webserver.id]
-  user_data                   = <<EOF
-                          #!/bin/bash
-                          yum -y update
-                          sudo amazon-linux-extras install nginx1
-                          echo "<h2>My WebServer<h2>" > /var/www/html/index.html
-                          sudo systemctl start nginx
-                          EOF
+  user_data                   = file("./modules/vpc/user_data.sh")
 }
 
 resource "aws_security_group" "my_webserver" {
@@ -82,6 +77,16 @@ resource "aws_security_group" "my_webserver" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group_rule" "icmp_rule" {
+  type              = "ingress"
+  protocol          = "icmp"
+  from_port         = "-1"
+  to_port           = "-1"
+  cidr_blocks       = var.destination_ping_route
+  security_group_id = aws_security_group.my_webserver.id
+}
+
 
 output "region" {
   value = var.vpc_region
